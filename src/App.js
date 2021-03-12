@@ -1,25 +1,59 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from 'axios';
+import React from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const URL = 'http://my.api.com/stories';
+
+export default class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      stories: [],
+      error: null,
+    };
+  }
+
+  componentDidMount() {
+    this.handleFetch();
+  }
+
+  setStories = (stories) => {
+    this.setState({ ...this.state, stories });
+  };
+
+  setError = (error) => {
+    this.setState({ ...this.state, error });
+  };
+
+  handleFetch = () => {
+    axios
+      .get(`${URL}?query=React`)
+      .then((response) => {
+        this.setStories(response.body.stories);
+      })
+      .catch((error) => {
+        this.setError(error);
+      });
+  };
+
+  render() {
+    return (
+      <div>
+        <button type="button" onClick={this.handleFetch}>
+          Fetch Stories
+        </button>
+
+        {this.state.error && (
+          <span data-testid="error">{this.state.error.message}</span>
+        )}
+
+        <ul>
+          {this.state.stories.map((story) => (
+            <li key={story.id}>
+              <a href={story.url}>{story.title}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 }
-
-export default App;
