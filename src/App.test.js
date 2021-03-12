@@ -14,12 +14,13 @@ describe('App', () => {
       { id: '2', title: 'React' },
     ];
 
-    axios.get.mockImplementationOnce(() =>
-      Promise.resolve({ body: { stories } })
-    );
+    const promise = Promise.resolve({ body: { stories } });
+
+    axios.get.mockImplementationOnce(() => promise);
 
     render(<App />);
 
+    await act(() => promise);
     const items = await screen.findAllByRole('listitem');
 
     expect(items).toHaveLength(2);
@@ -33,12 +34,13 @@ describe('App', () => {
       { id: '2', title: 'React' },
     ];
 
-    axios.get.mockImplementationOnce(() =>
-      Promise.resolve({ body: { stories } })
-    );
+    const promise = Promise.resolve({ body: { stories } });
+
+    axios.get.mockImplementationOnce(() => promise);
 
     render(<App />);
 
+    await act(() => promise);
     const errorElement = screen.queryByTestId('error');
 
     expect(errorElement).toBeNull();
@@ -64,7 +66,9 @@ describe('App', () => {
     );
 
     render(<App />);
+
     await waitFor(() => screen.getByText('Could not fetch stories'));
+
     let items = screen.queryAllByRole('listitem');
     expect(items).toHaveLength(0);
 
@@ -77,9 +81,11 @@ describe('App', () => {
 
     axios.get.mockImplementationOnce(() => promise);
 
-    await userEvent.click(screen.getByRole('button'));
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'));
 
-    await act(() => promise);
+      await promise;
+    });
     items = await screen.findAllByRole('listitem');
 
     expect(items).toHaveLength(2);
