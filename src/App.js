@@ -13,7 +13,13 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    this.handleFetch();
+    this.fetchStories();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.query !== this.props.query) {
+      this.fetchStories();
+    }
   }
 
   setStories = (stories) => {
@@ -24,9 +30,9 @@ export default class App extends React.Component {
     this.setState({ ...this.state, error });
   };
 
-  handleFetch = () => {
+  fetchStories = () => {
     axios
-      .get(`${URL}?query=React`)
+      .get(`${URL}?query=${encodeURI(this.props.query)}`)
       .then((response) => {
         this.setStories(response.body.stories);
       })
@@ -38,7 +44,7 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <button type="button" onClick={this.handleFetch}>
+        <button type="button" onClick={this.fetchStories}>
           Fetch Stories
         </button>
 
